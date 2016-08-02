@@ -1,14 +1,24 @@
 //console.log(Object.keys(process));
 var command = require('./command.js');
 process.stdout.write('promote > ');
-var done = function(output,stdin){
-	if(stdin.length===0){
+function done(output){
+	if(inputs.length===0){
 	process.stdout.write(output);
 	process.stdout.write("\nprompt > ");
 	} else {
-		var nextRun = stdin.shift();
-		var inputs = nextRun.split(" ")
-		
+		var secondCommand,secondFile;
+		var secondInput = inputs.shift().split(" ");
+		if(secondInput.length>1) {
+			secondCommand = secondInput[0];
+			secondFile = secondInput[1];
+		}else{ //secondInput.length ===1
+			secondCommand = secondInput;
+			secondFile = null;
+		}
+		var stdin = output;
+		//var inputs = nextRun.split(" ")
+		command[secondCommand](stdin,secondFile,done);
+
 	}	
 
 
@@ -16,11 +26,12 @@ var done = function(output,stdin){
 
 process.stdin.on('data',function(data){
 	var cmdString = data.toString().trim();
-	var inputs = cmdString.split(/\s*\|\s*/gi);
+	inputs = cmdString.split(/\s*\|\s*/gi);  //seting inputs to global
+	//console.log(inputs);
 	var firstInput = inputs.shift();
 	var firstCommand = firstInput.split(" ")[0];
 	var firstFile = firstInput.split(" ").slice(1)
-	var stdin = inputs;
+	var stdin = null;
 	//console.log(firstFile);
 	//process.stdout.write('You type: ' + str);
 	if(firstCommand ==="pwd") command.pwd(stdin, firstFile,done);
